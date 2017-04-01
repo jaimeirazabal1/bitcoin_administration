@@ -20,6 +20,11 @@ $db = new Db();
 		</div>
 		<form action="">
 			<div class="form-group">
+				<label>#</label>
+				<input type="text" required="required" class="form-control" name="idoperacion" id="idoperacion">
+				<p class="muted">validar esto antes de que se siga</p>
+			</div>
+			<div class="form-group">
 				<label>Tipo de Operacion</label>
 				<select name="tipo" required="required"	class="form-control" id="tipo">
 					<option value="">Seleccione</option>
@@ -41,8 +46,14 @@ $db = new Db();
 				<input type="text" required="required" class="form-control" name="btc" id="btc">
 			</div>
 			<div class="form-group">
-				<label>Precio</label>
-				<input type="text" required="required" class="form-control" name="precio" id="precio">
+				<label>Monto</label>
+				<input type="text" required="required" class="form-control" name="monto" id="monto">
+			</div>
+			<div class="form-group">
+				<label>Referencia de Pago</label>
+				<input type="text" required="required" class="form-control" name="ref_pago" id="ref_pago">
+								<p class="muted">validar esto antes de que se siga</p>
+
 			</div>
 			<div class="form-group">
 				<label>Observacion</label>
