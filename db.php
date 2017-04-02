@@ -57,7 +57,13 @@ class Db extends PDO{
 	}
 	public function get_transaction($tipo = 'compra'){
 		if (isset($_GET['created']) and !empty($_GET['created'])) {
-			$query = "SELECT * FROM transaction where tipo = '".$tipo."' and created='".$_GET['created']."' order by created asc";
+			$partes = explode(' ',$_GET['created']);
+			if ($partes[1] == '00:00:00' or $partes[1]='') {
+				$date_sub = " and  CAST(created AS DATE) = '".$partes[0]."' ";
+			}else{
+				$date_sub = " and created = '".$_GET['created']."' ";
+			}
+			$query = "SELECT * FROM transaction where tipo = '".$tipo."' $date_sub order by created asc";
 		}else{
 			$query = "SELECT * FROM transaction where tipo = '".$tipo."' order by created asc";
 		}
@@ -65,7 +71,13 @@ class Db extends PDO{
 	}
 	public function get_by_moneda($moneda,$tipo = "compra"){
 		if (isset($_GET['created']) and !empty($_GET['created'])) {
-			$query = "SELECT * FROM transaction WHERE tipo = '".$tipo."' and moneda = '".$moneda."' and created='".$_GET['created']."' order by created asc";
+			$partes = explode(' ',$_GET['created']);
+			if ($partes[1] == '00:00:00' or $partes[1]='') {
+				$date_sub = " and  CAST(created AS DATE) = '".$partes[0]."' ";
+			}else{
+				$date_sub = " and created = '".$_GET['created']."' ";
+			}
+			$query = "SELECT * FROM transaction WHERE tipo = '".$tipo."' and moneda = '".$moneda."' $date_sub order by created asc";
 		}else{
 			$query = "SELECT * FROM transaction WHERE tipo = '".$tipo."' and moneda = '".$moneda."' order by created asc";
 		}

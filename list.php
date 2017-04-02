@@ -20,7 +20,6 @@ if (isset($_SESSION['data'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>BitCoinAdministration</title>
 	<link rel="stylesheet" href="css/css/bootstrap.min.css">
-	<link rel="stylesheet" href="css/css/bootstrap-datepicker.min.css">
 	<style type="text/css">
 		.wrap{
 			margin-top:10px;
@@ -37,6 +36,8 @@ if (isset($_SESSION['data'])) {
 	<script type="text/javascript" src="js/moment.js"></script>
 	<script type="text/javascript" src="js/bootstrap-datetimepicker.js"></script>
 	<script type="text/javascript" src="js/bootstrap-datepicker.es.min.js"></script>
+	<link rel="stylesheet" href="css/css/bootstrap-datepicker.min.css">
+	
 
 
 
@@ -126,7 +127,7 @@ if (isset($_SESSION['data'])) {
 								<td><?php echo number_format(str_replace(',','.',str_replace('.', '', $value->monto)),2,'.',',') ?></td>
 								<td><?php echo $value->ref_pago ?></td>
 								<!--<td><?php echo $value->observacion ?></td>-->
-								<td>
+								<td title="<?php echo $value->created ?>">
 									<?php echo number_format((float)str_replace(',','.',str_replace('.', '', $value->monto))/(float)str_replace(',', '.', $value->btc),2,'.',',') ?>
 								</td>
 							</tr>
@@ -192,7 +193,7 @@ if (isset($_SESSION['data'])) {
 								<td><?php echo number_format(str_replace(',','.',str_replace('.', '', $value->monto)),2,'.',',') ?></td>
 								<td><?php echo $value->ref_pago ?></td>
 								<!-- <td><?php echo $value->observacion ?></td> -->
-								<td>
+								<td title="<?php echo $value->created ?>">
 									<?php echo number_format((float)str_replace(',','.',str_replace('.', '', $value->monto))/(float)str_replace(',', '.', $value->btc),2,'.',',') ?>
 								</td>
 							</tr>
