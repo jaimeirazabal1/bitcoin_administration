@@ -130,4 +130,18 @@ class Db extends PDO{
 		}
 		return $btc-$btc2;	
 	}
+	public function delete($idoperacion){
+		if ($idoperacion) {
+			$query = "DELETE FROM transaction where idoperacion = '".$idoperacion."' ";
+			return $this->get($query);
+		}
+	}
+	public function buscarIdOperacion($id){
+		$query = "SELECT * from transaction where idoperacion='$id'";
+		return $this->count_($query);
+	}
+	public function buscarRefPago($ref){
+		$query = "SELECT * from transaction where ref_pago='$ref'";
+		return $this->count_($query);
+	}
 }

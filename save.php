@@ -12,7 +12,7 @@ if (isset($_POST['guardar'])) {
 	if (!$db->esCampoRepetido('idoperacion',$_POST['idoperacion'])) {
 		if (!$db->esCampoRepetido('ref_pago',$_POST['ref_pago'])) {
 			if($db->guardar('transaction',$_POST,array('guardar'))){
-				$_SESSION['mensaje.alerta'][] = array('alert alert-success','transaction succesfully saved!');
+				$_SESSION['mensaje.alerta'][] = array('alert alert-success','transaction succesfully saved #'.$_POST['idoperacion'].'! ');
 				unset($_SESSION['data']);
 			}
 		}else{

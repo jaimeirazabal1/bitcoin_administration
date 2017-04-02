@@ -8,7 +8,7 @@ include_once('message.php');
 $db = new Db();
 if (isset($_SESSION['data'])) {
 	foreach ($_SESSION['data'] as $key => $value) {
-		$_POST[$key]=$vallue;
+		$_POST[$key]=$value;
 	}
 }
 ?>
@@ -28,6 +28,9 @@ if (isset($_SESSION['data'])) {
 		.table-condensed tr:hover{
 			background-color: #eee;
 		}
+		.eliminar:hover{
+			cursor:pointer;
+		}
 	</style>
 	<script type="text/javascript" src="js/jquery-2.0.0.min.js"></script>
 	<script type="text/javascript" src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
@@ -46,7 +49,16 @@ if (isset($_SESSION['data'])) {
 
 	<div class="text-center">
 		<h2>Lista de Transacciones</h2>
+		<?php new Message() ?>
 		<div class="container" style="position:relative">
+			<div style="position:absolute;left:20px;top:-60px">
+				<table class="">
+				
+					<tr>
+						<td><img src="bitcoin.png" alt="" width="100px"></td>
+					</tr>
+				</table>
+			</div>
 			<div style="position:absolute;right:20px;top:-40px">
 				<table class="table table-bordered">
 					<thead>
@@ -73,12 +85,12 @@ if (isset($_SESSION['data'])) {
 					<?php endforeach ?>
 				</select>
 	            <select name="created" class="form-control" id="created">
-	            	<option value="hoy">Hoy</option>
-	            	<option value="mes">Mes</option>
-	            	<option value="todo">Todo</option>
+	            	<option value="hoy" <?php if(isset($_GET['created']) and $_GET['created'] == 'hoy'): echo "selected"; endif; ?>>Hoy</option>
+	            	<option value="mes" <?php if(isset($_GET['created']) and $_GET['created'] == 'mes'): echo "selected"; endif; ?>>Mes</option>
+	            	<option value="todo" <?php if(isset($_GET['created']) and $_GET['created'] == 'todo'): echo "selected"; endif; ?>>Todo</option>
 	            </select>
 				<input type="submit" class="btn btn-default" name="buscar" value="Buscar">
-				<a href="index.php" class="btn btn-default">Agregar Transaccion</a>
+				<a href="index.php" class="btn btn-default" onclick="window.open('index.php', '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');return false;" >Agregar Transaccion</a>
 			</div>
 		</form>
 	</div>
@@ -136,7 +148,7 @@ if (isset($_SESSION['data'])) {
 					<?php $monto_suma = 0; ?>
 					<?php $cantidad_compras = 0 ?>
 						<?php foreach ($transaction as $key => $value): ?>
-							<tr>
+							<tr class='eliminar' id="<?php echo $value->idoperacion ?>">
 								<td><?php echo $value->idoperacion ?></td>
 								<td><?php echo $value->moneda ?></td>
 								<td><?php echo str_replace(',', '.', $value->btc) ?></td>
@@ -207,7 +219,7 @@ if (isset($_SESSION['data'])) {
 					<?php $monto_suma2 = 0; ?>
 					<?php $cantidad_ventas = 0; ?>
 						<?php foreach ($transaction as $key => $value): ?>
-							<tr>
+							<tr class='eliminar' id="<?php echo $value->idoperacion ?>">
 								<td><?php echo $value->idoperacion ?></td>
 								<td><?php echo $value->moneda ?></td>
 								<td><?php echo str_replace(',', '.', $value->btc) ?></td>
@@ -235,7 +247,47 @@ if (isset($_SESSION['data'])) {
 				$('#datetimepicker1,#datetimepicker2').datetimepicker({
 					format : 'YYYY-MM-DD HH:mm:ss'
 				});
-			    $('#compra,#venta').DataTable({
+
+				$('.eliminar').on("contextmenu", function(evt) {
+					evt.preventDefault();
+					if (confirm('Esta Seguro que desea eliminar la transaccion #'+$(this).attr("id"))) {
+					    location.href='delete.php?idoperacion='+$(this).attr("id");
+					};
+					return false;
+				});
+				
+				<?php if (count($db->get_by_moneda($_GET['moneda']))): ?>
+			    $('#compra').DataTable({
+			    	"aaSorting": [],
+			    	language:{
+					    "sProcessing":     "Procesando...",
+					    "sLengthMenu":     "Mostrar _MENU_ registros",
+					    "sZeroRecords":    "No se encontraron resultados",
+					    "sEmptyTable":     "Ningún dato disponible en esta tabla",
+					    "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+					    "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+					    "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+					    "sInfoPostFix":    "",
+					    "sSearch":         "Buscar:",
+					    "sUrl":            "",
+					    "sInfoThousands":  ",",
+					    "sLoadingRecords": "Cargando...",
+					    "oPaginate": {
+					        "sFirst":    "Primero",
+					        "sLast":     "Último",
+					        "sNext":     "Siguiente",
+					        "sPrevious": "Anterior"
+					    },
+					    "oAria": {
+					        "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+					        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+					    }
+					}
+			    });					
+				<?php endif; ?>
+				<?php if (count($db->get_by_moneda($_GET['moneda'],'venta'))): ?>
+
+			    $('#venta').DataTable({
 			    	"aaSorting": [],
 			    	language:{
 					    "sProcessing":     "Procesando...",
@@ -262,6 +314,7 @@ if (isset($_SESSION['data'])) {
 					    }
 					}
 			    });
+				<?php endif; ?>
 			} );
 		</script>
 	</div>

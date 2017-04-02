@@ -24,6 +24,97 @@ $db = new Db();
 		}
 	</style>
 	<script type="text/javascript" src="js/jquery-2.0.0.min.js"></script>
+	<script type="text/javascript">
+	var formatNumber = {
+	 separador: ",", // separador para los miles
+	 sepDecimal: '.', // separador para los decimales
+	 formatear:function (num){
+	 num +='';
+	 var splitStr = num.split('.');
+	 var splitLeft = splitStr[0];
+	 var splitRight = splitStr.length > 1 ? this.sepDecimal + splitStr[1] : '';
+	 var regx = /(\d+)(\d{3})/;
+	 while (regx.test(splitLeft)) {
+	 splitLeft = splitLeft.replace(regx, '$1' + this.separador + '$2');
+	 }
+	 return this.simbol + splitLeft +splitRight;
+	 },
+	 new:function(num, simbol){
+	 this.simbol = simbol ||'';
+	 return this.formatear(num);
+	 }
+	}
+		$(document).ready(function(){
+			$("#guardar").click(function(){
+				var mensaje = 'Esta a punto de crear la siguiente operacion:\nMonto:'+$("#monto").val()+' \nBTC:'+$('#btc').val()+' \nMoneda:'+$("#moneda").val()+' \nOperacion: '+$("#tipo").val()+' \n\nconforme?';
+				if (!confirm(mensaje)) {
+					return false;
+				};
+			});
+			$("#idoperacion").blur(function(){
+				$(this).parent().find('p').text("Verificando id de operación");
+				var este = $(this);
+				if (!$("#idoperacion").val()) { return;};
+
+				$.ajax({
+					url:'verificar.php?idoperacion='+$("#idoperacion").val(),
+					dataType:'json',
+
+					success:function(r){
+						console.log(r)
+						if (r) {
+							este.parent().find('p').text("").css({
+								border:'1px solid white',
+								background:'white',
+								color:'white'
+							});
+							
+						}else{
+							este.parent().find('p').text("Id de Verificación repetido").css({
+								border:'1px solid red',
+								background:'red',
+								color:'white'
+							});
+							este.focus();
+
+						}
+
+					}
+				})
+			});
+			$("#ref_pago").blur(function(){
+				$(this).parent().find('p').text("Verificando id de operación");
+				var este = $(this);
+				if (!$("#ref_pago").val()) { return;};
+				$.ajax({
+					url:'verificar.php?ref_pago='+$("#ref_pago").val(),
+					dataType:'json',
+
+					success:function(r){
+						console.log(r)
+						if (r) {
+
+							este.parent().find('p').text("").css({
+								border:'1px solid white',
+								background:'white',
+								color:'white'
+							});
+							
+						}else{
+							este.parent().find('p').text("Id de Verificación repetido").css({
+								border:'1px solid red',
+								background:'red',
+								color:'white'
+							});
+							este.focus();
+
+						}
+
+					}
+				})
+			})
+		});
+	</script>
 </head>
 <body>
 	<div class="col-md-3 col-sm-3"></div>
@@ -97,7 +188,7 @@ $db = new Db();
 				<label>Observacion</label>
 				<textarea name="observacion" required="required" id="observacion" class="form-control" cols="30" rows="2"> <?php echo isset($_SESSION['data']['observacion']) ? $_SESSION['data']['observacion'] : '' ?></textarea>
 			</div>
-			<input type="submit" class="btn btn-success" name="guardar" value="Guardar">
+			<input type="submit" class="btn btn-success" name="guardar" id="guardar" value="Guardar">
 			<a href="list.php?moneda=VEF&created=hoy&buscar=Buscar" class="btn btn-primary">Lista</a>
 		</form>
 	</div>
