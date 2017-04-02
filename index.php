@@ -45,8 +45,9 @@ $db = new Db();
 	 }
 	}
 		$(document).ready(function(){
+			
 			$("#guardar").click(function(){
-				var mensaje = 'Esta a punto de crear la siguiente operacion:\nMonto:'+$("#monto").val()+' \nBTC:'+$('#btc').val()+' \nMoneda:'+$("#moneda").val()+' \nOperacion: '+$("#tipo").val()+' \n\nconforme?';
+				var mensaje = 'Esta a punto de crear la siguiente operacion:\nMonto:'+formatNumber.new($("#monto").val())+' \nBTC:'+$('#btc').val()+' \nMoneda:'+$("#moneda").val()+' \nOperacion: '+$("#tipo").val()+' \n\nconforme?';
 				if (!confirm(mensaje)) {
 					return false;
 				};
