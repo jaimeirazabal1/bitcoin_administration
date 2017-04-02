@@ -37,19 +37,31 @@ if (isset($_SESSION['data'])) {
 	<script type="text/javascript" src="js/bootstrap-datetimepicker.js"></script>
 	<script type="text/javascript" src="js/bootstrap-datepicker.es.min.js"></script>
 	<link rel="stylesheet" href="css/css/bootstrap-datepicker.min.css">
-	
+
 
 
 
 </head>
 <body>
+
 	<div class="text-center">
 		<h2>Lista de Transacciones</h2>
-		<form action="" style="width:800px;margin:auto" class="form-inline">
+		<div class="container" style="position:relative">
+			<div style="position:absolute;right:20px;top:-40px">
+				<table class="table table-bordered">
+					<thead>
+						<th class="text-center">Cartera</th>
+					</thead>
+					<tr>
+						<td><?php echo $db->get_saldo() ?></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+		<form action="" style="width:100%;margin:auto" class="form-inline">
 			<div class="form-group">
 				<label>Moneda</label>
 				<select name="moneda" class="form-control" id="moneda">
-					<option value="">Seleccione</option>
 					<?php foreach ($db->get_currencies() as $key => $value): ?>
 						<?php if (isset($_GET['moneda']) and $_GET['moneda'] == $value->currabrev): ?>
 							
@@ -60,24 +72,25 @@ if (isset($_SESSION['data'])) {
 						<?php endif ?>
 					<?php endforeach ?>
 				</select>
-	            <div class="form-group">
-	                <div class='input-group date' id='datetimepicker1'>
-	                    <input type='text' name="created" class="form-control" value="<?php if(isset($_GET['created'])): echo $_GET['created']; endif; ?>" />
-	                    <span class="input-group-addon">
-	                        <span class="glyphicon glyphicon-calendar"></span>
-	                    </span>
-	                </div>
-	            </div>
+	            <select name="created" class="form-control" id="created">
+	            	<option value="hoy">Hoy</option>
+	            	<option value="mes">Mes</option>
+	            	<option value="todo">Todo</option>
+	            </select>
 				<input type="submit" class="btn btn-default" name="buscar" value="Buscar">
 				<a href="index.php" class="btn btn-default">Agregar Transaccion</a>
 			</div>
 		</form>
 	</div>
 	<div class="wrap container">
+
 		<div class="row">
 			<div class="col-md-6 col-sm-6">
 				<table class="table table-condensed table-bordered">
 					<?php if (isset($_GET['moneda']) and $_GET['moneda']): ?>
+						<?php $suma_result = $db->get_suma_compra($_GET['moneda']) ?>
+						<?php $monto_result = $db->get_suma_monto($_GET['moneda']) ?>
+
 						<?php $promedio = $db->get_promedio($_GET['moneda']) ?>
 						<?php $btc_suma = 0; ?>
 						<?php $monto_suma = 0; ?>
@@ -88,17 +101,20 @@ if (isset($_SESSION['data'])) {
 						<?php endforeach ?>
 					<?php endif; ?>
 					<tr>
-						<td id="display_btc_suma1" class="text-center"><?php echo number_format($btc_suma,8,'.',',') ?></td>
-						<td id="display_monto_suma1" class="text-center"><?php echo number_format($monto_suma,2,'.',',') ?></td>
+						<td id="display_btc_suma1" class="text-center"><?php echo $suma_result ?></td>
+						<td id="display_monto_suma1" class="text-center"><?php echo number_format($monto_result,2,'.',',') ?></td>
+						<?php if (isset($btc_suma) and $btc_suma): ?>
+							
 						<td id="display_division1" class="text-center"><?php echo number_format((float)$monto_suma/$btc_suma,2,'.',',') ?></td>
+						<?php endif ?>
 					</tr>
 					<tr>
-						<td></td>
-						<td></td>
+						<td class="text-center"><b>Total Compra</b></td>
+						<td class="text-center"><b>Total Monto</b></td>
 						<td class="text-center"><b>Promedio Compra</b></td>
 					</tr>
 				</table>
-				<div class="text-center">
+				<div class="text-center bg-info" >
 					<h3>Compra</h3>
 				</div>
 				<table class="table table-condensed table-bordered" id="compra">
@@ -111,7 +127,7 @@ if (isset($_SESSION['data'])) {
 						<!-- <th>Observacion</th> -->
 						<th>Tasa</th>
 					</thead>
-					<?php $transaction = $db->get_transaction() ?>
+					<?php //$transaction = $db->get_transaction() ?>
 					<?php if (isset($_GET['moneda']) and $_GET['moneda']): ?>
 						<?php $transaction = $db->get_by_moneda($_GET['moneda']) ?>
 					<?php endif ?>
@@ -127,7 +143,7 @@ if (isset($_SESSION['data'])) {
 								<td><?php echo number_format(str_replace(',','.',str_replace('.', '', $value->monto)),2,'.',',') ?></td>
 								<td><?php echo $value->ref_pago ?></td>
 								<!--<td><?php echo $value->observacion ?></td>-->
-								<td title="<?php echo $value->created ?>">
+								<td title="<?php echo $value->created.' | '.$value->observacion ?>">
 									<?php echo number_format((float)str_replace(',','.',str_replace('.', '', $value->monto))/(float)str_replace(',', '.', $value->btc),2,'.',',') ?>
 								</td>
 							</tr>
@@ -144,6 +160,8 @@ if (isset($_SESSION['data'])) {
 				<table class="table table-condensed table-bordered">
 					<?php if (isset($_GET['moneda']) and $_GET['moneda']): ?>
 						<?php $promedio = $db->get_promedio($_GET['moneda'],'venta') ?>
+						<?php $suma_result = $db->get_suma_compra($_GET['moneda'],'venta') ?>
+						<?php $monto_result = $db->get_suma_monto($_GET['moneda'],'venta') ?>
 						<?php $btc_suma = 0; ?>
 						<?php $monto_suma = 0; ?>
 						<?php foreach ($promedio as $key => $value): ?>
@@ -153,17 +171,20 @@ if (isset($_SESSION['data'])) {
 						<?php endforeach ?>
 					<?php endif; ?>
 					<tr>
-						<td id="display_btc_suma1" class="text-center"><?php echo number_format($btc_suma,8,'.',',') ?></td>
-						<td id="display_monto_suma1" class="text-center"><?php echo number_format($monto_suma,2,'.',',') ?></td>
+						<td id="display_btc_suma1" class="text-center"><?php echo $suma_result ?></td>
+						<td id="display_monto_suma1" class="text-center"><?php echo number_format($monto_result,2,'.',',') ?></td>
+						<?php if (isset($btc_suma) and $btc_suma): ?>
+							
 						<td id="display_division1" class="text-center"><?php echo number_format((float)$monto_suma/$btc_suma,2,'.',',') ?></td>
+						<?php endif ?>
 					</tr>
 					<tr>
-						<td></td>
-						<td></td>
+						<td class="text-center"><b>Total Venta</b></td>
+						<td class="text-center"><b>Total Monto</b></td>
 						<td class="text-center"><b>Promedio Venta</b></td>
 					</tr>
 				</table>
-				<div class="text-center">
+				<div class="text-center bg-success">
 					<h3>Venta</h3>
 				</div>
 				<table class="table table-condensed table-bordered" id="venta">
@@ -176,7 +197,7 @@ if (isset($_SESSION['data'])) {
 						<!-- <th>Observacion</th> -->
 						<th>Tasa</th>
 					</thead>
-					<?php $transaction = $db->get_transaction('venta') ?>
+					<?php //$transaction = $db->get_transaction('venta') ?>
 					<?php if (isset($_GET['moneda']) and $_GET['moneda']): ?>
 					
 						<?php $transaction = $db->get_by_moneda($_GET['moneda'],'venta') ?>
@@ -193,7 +214,7 @@ if (isset($_SESSION['data'])) {
 								<td><?php echo number_format(str_replace(',','.',str_replace('.', '', $value->monto)),2,'.',',') ?></td>
 								<td><?php echo $value->ref_pago ?></td>
 								<!-- <td><?php echo $value->observacion ?></td> -->
-								<td title="<?php echo $value->created ?>">
+								<td title="<?php echo $value->created.' | '.$value->observacion ?>">
 									<?php echo number_format((float)str_replace(',','.',str_replace('.', '', $value->monto))/(float)str_replace(',', '.', $value->btc),2,'.',',') ?>
 								</td>
 							</tr>
@@ -211,7 +232,7 @@ if (isset($_SESSION['data'])) {
 		
 		<script type="text/javascript">
 			$(document).ready(function() {
-				$('#datetimepicker1').datetimepicker({
+				$('#datetimepicker1,#datetimepicker2').datetimepicker({
 					format : 'YYYY-MM-DD HH:mm:ss'
 				});
 			    $('#compra,#venta').DataTable({

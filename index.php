@@ -98,7 +98,7 @@ $db = new Db();
 				<textarea name="observacion" required="required" id="observacion" class="form-control" cols="30" rows="2"> <?php echo isset($_SESSION['data']['observacion']) ? $_SESSION['data']['observacion'] : '' ?></textarea>
 			</div>
 			<input type="submit" class="btn btn-success" name="guardar" value="Guardar">
-			<a href="list.php" class="btn btn-primary">Lista</a>
+			<a href="list.php?moneda=VEF&created=hoy&buscar=Buscar" class="btn btn-primary">Lista</a>
 		</form>
 	</div>
 	<div class="col-md-3 col-sm-3"></div>
