@@ -55,7 +55,7 @@ if (isset($_SESSION['data'])) {
 				<table class="">
 				
 					<tr>
-						<td><img src="bitcoin.png" alt="" width="100px"></td>
+						<td><img src="bitcoin-495997_640.png" alt="" width="150px"></td>
 					</tr>
 				</table>
 			</div>
