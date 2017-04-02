@@ -29,37 +29,7 @@ if (isset($_SESSION['data'])) {
 	<script type="text/javascript" src="js/jquery-2.0.0.min.js"></script>
 	<script type="text/javascript" src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
 	<script type="text/javascript" src="https://cdn.datatables.net/1.10.13/js/dataTables.bootstrap.min.js"></script>
-	<script type="text/javascript">
-		$(document).ready(function() {
-		    $('#compra,#venta').DataTable({
-		    	"aaSorting": [],
-		    	language:{
-				    "sProcessing":     "Procesando...",
-				    "sLengthMenu":     "Mostrar _MENU_ registros",
-				    "sZeroRecords":    "No se encontraron resultados",
-				    "sEmptyTable":     "Ningún dato disponible en esta tabla",
-				    "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-				    "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
-				    "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-				    "sInfoPostFix":    "",
-				    "sSearch":         "Buscar:",
-				    "sUrl":            "",
-				    "sInfoThousands":  ",",
-				    "sLoadingRecords": "Cargando...",
-				    "oPaginate": {
-				        "sFirst":    "Primero",
-				        "sLast":     "Último",
-				        "sNext":     "Siguiente",
-				        "sPrevious": "Anterior"
-				    },
-				    "oAria": {
-				        "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
-				        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
-				    }
-				}
-		    });
-		} );
-	</script>
+
 
 
 </head>
@@ -126,15 +96,15 @@ if (isset($_SESSION['data'])) {
 							<tr>
 								<td><?php echo $value->idoperacion ?></td>
 								<td><?php echo $value->moneda ?></td>
-								<td><?php echo $value->btc ?></td>
-								<?php $btc_suma = $btc_suma + $value->btc ?>
-								<td><?php echo $value->monto ?></td>
-								<?php $monto_suma = $monto_suma + $value->monto ?>
+								<td><?php echo str_replace(',', '.', $value->btc) ?></td>
+								<?php $btc_suma = $btc_suma + str_replace(',', '.', $value->btc) ?>
+								<td><?php echo number_format(str_replace(',','.',str_replace('.', '', $value->monto)),2,'.',',') ?></td>
+								<?php $monto_suma = $monto_suma + (float)str_replace(',','.',str_replace('.', '', $value->monto)) ?>
 
 								<td><?php echo $value->ref_pago ?></td>
 								<!--<td><?php echo $value->observacion ?></td>-->
 								<td>
-									<?php echo number_format((float)$value->monto/(float)str_replace(',', '.', $value->btc),5,'.',',') ?>
+									<?php echo number_format((float)str_replace(',','.',str_replace('.', '', $value->monto))/(float)str_replace(',', '.', $value->btc),2,'.',',') ?>
 								</td>
 							</tr>
 						<?php $cantidad_compras++ ?>
@@ -185,14 +155,14 @@ if (isset($_SESSION['data'])) {
 							<tr>
 								<td><?php echo $value->idoperacion ?></td>
 								<td><?php echo $value->moneda ?></td>
-								<td><?php echo $value->btc ?></td>
-								<?php $btc_suma2 = $btc_suma2 + $value->btc ?>
-								<td><?php echo $value->monto ?></td>
-								<?php $monto_suma2 = $monto_suma2 + $value->monto ?>
+								<td><?php echo str_replace(',', '.', $value->btc) ?></td>
+								<?php $btc_suma2 = $btc_suma2 + str_replace(',', '.', $value->btc) ?>
+								<td><?php echo number_format(str_replace(',','.',str_replace('.', '', $value->monto)),2,'.',',') ?></td>
+								<?php $monto_suma2 = $monto_suma2 + (float)str_replace(',','.',str_replace('.', '', $value->monto)) ?>
 								<td><?php echo $value->ref_pago ?></td>
 								<!-- <td><?php echo $value->observacion ?></td> -->
 								<td>
-									<!-- <?php echo number_format($value->monto/$value->btc,5,',','.') ?> -->
+									<?php echo number_format((float)str_replace(',','.',str_replace('.', '', $value->monto))/(float)str_replace(',', '.', $value->btc),2,'.',',') ?>
 								</td>
 							</tr>
 							<?php $cantidad_ventas++ ?>
@@ -205,19 +175,84 @@ if (isset($_SESSION['data'])) {
 				</table>
 			</div>
 		</div>
-		<input type="hidden" id="monto_suma" value="<?php echo isset($monto_suma) ? $monto_suma : "" ?>">
-		<input type="hidden" id="btc_suma" value="<?php echo isset($btc_suma) ? $btc_suma : "" ?>">
-		<input type="hidden" id="monto_suma2" value="<?php echo isset($monto_suma2) ? $monto_suma2 : "" ?>">
-		<input type="hidden" id="btc_suma2" value="<?php echo isset($btc_suma2) ? $btc_suma2 : "" ?>">
+		<input type="hidden" id="monto_suma" value="<?php echo number_format(isset($monto_suma) ? $monto_suma : 0,2,'.','') ?>">
+		<input type="hidden" id="btc_suma" value="<?php echo number_format(isset($btc_suma) ? $btc_suma : 0,8,'.','') ?>">
+		<?php if (isset($monto_suma)): ?>
+			
+		<input type="hidden" id="input_division1" value="<?php echo number_format(isset($btc_suma) ? $btc_suma : 0,8,'.','')/number_format(isset($monto_suma) ? $monto_suma : 0,2,'.','') ?>">
+		<?php endif ?>
+		<?php if (isset($monto_suma2)): ?>
+			
+		<input type="hidden" id="monto_suma2" value="<?php echo number_format(isset($monto_suma2) ? $monto_suma2 : 0,2,'.','') ?>">
+		<?php endif ?>
+		<input type="hidden" id="btc_suma2" value="<?php echo number_format(isset($btc_suma2) ? $btc_suma2 : 0,8,'.','') ?>">
+		<?php if (isset($monto_suma2)): ?>
+			
+		<input type="hidden" id="input_division2" value="<?php echo number_format(isset($btc_suma2) ? $btc_suma2 : 0,8,'.','')/number_format(isset($monto_suma2) ? $monto_suma2 : 0,2,'.','') ?>">
+		<?php endif ?>
 		<script type="text/javascript">
+		var formatNumber = {
+		 separador: ",", // separador para los miles
+		 sepDecimal: '.', // separador para los decimales
+		 formatear:function (num){
+		 num +='';
+		 var splitStr = num.split('.');
+		 var splitLeft = splitStr[0];
+		 var splitRight = splitStr.length > 1 ? this.sepDecimal + splitStr[1] : '';
+		 var regx = /(\d+)(\d{3})/;
+		 while (regx.test(splitLeft)) {
+		 splitLeft = splitLeft.replace(regx, '$1' + this.separador + '$2');
+		 }
+		 return this.simbol + splitLeft +splitRight;
+		 },
+		 new:function(num, simbol){
+		 this.simbol = simbol ||'';
+		 return this.formatear(num);
+		 }
+		}
 			$(document).ready(function(){
-				$("#display_btc_suma1").text($("#btc_suma").val());
-				$("#display_monto_suma1").text($("#monto_suma").val());
-				$("#display_division1").text(($("#monto_suma").val()/$("#btc_suma").val()).toFixed(6));
-				$("#display_btc_suma2").text($("#btc_suma2").val());
-				$("#display_monto_suma2").text($("#monto_suma2").val());
+				$("#display_btc_suma1").text(formatNumber.new($("#btc_suma").val()));
+				$("#display_monto_suma1").text(formatNumber.new($("#monto_suma").val()));
+				$("#display_division1").text(formatNumber.new(($("#monto_suma").val()/$("#btc_suma").val()).toFixed(2)));
+				$("#display_btc_suma2").text(formatNumber.new($("#btc_suma2").val()));
+				$("#display_monto_suma2").text(formatNumber.new($("#monto_suma2").val()));
+				$("#display_division2").text(formatNumber.new(($("#monto_suma2").val()/$("#btc_suma2").val()).toFixed(2)));
+
 			})
 		</script>
+		<script type="text/javascript">
+			$(document).ready(function() {
+			    $('#compra,#venta').DataTable({
+			    	"aaSorting": [],
+			    	language:{
+					    "sProcessing":     "Procesando...",
+					    "sLengthMenu":     "Mostrar _MENU_ registros",
+					    "sZeroRecords":    "No se encontraron resultados",
+					    "sEmptyTable":     "Ningún dato disponible en esta tabla",
+					    "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+					    "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+					    "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+					    "sInfoPostFix":    "",
+					    "sSearch":         "Buscar:",
+					    "sUrl":            "",
+					    "sInfoThousands":  ",",
+					    "sLoadingRecords": "Cargando...",
+					    "oPaginate": {
+					        "sFirst":    "Primero",
+					        "sLast":     "Último",
+					        "sNext":     "Siguiente",
+					        "sPrevious": "Anterior"
+					    },
+					    "oAria": {
+					        "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+					        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+					    }
+					}
+			    });
+			} );
+		</script>
 	</div>
+
+
 </body>
 </html>
