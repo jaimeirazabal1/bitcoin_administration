@@ -20,15 +20,23 @@ if (isset($_SESSION['data'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>BitCoinAdministration</title>
 	<link rel="stylesheet" href="css/css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/css/bootstrap-datepicker.min.css">
 	<style type="text/css">
 		.wrap{
 			margin-top:10px;
 			margin-bottom:10px;
 		}
+		.table-condensed tr:hover{
+			background-color: #eee;
+		}
 	</style>
 	<script type="text/javascript" src="js/jquery-2.0.0.min.js"></script>
 	<script type="text/javascript" src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
 	<script type="text/javascript" src="https://cdn.datatables.net/1.10.13/js/dataTables.bootstrap.min.js"></script>
+	<script type="text/javascript" src="js/bootstrap-datepicker.min.js"></script>
+	<script type="text/javascript" src="js/moment.js"></script>
+	<script type="text/javascript" src="js/bootstrap-datetimepicker.js"></script>
+	<script type="text/javascript" src="js/bootstrap-datepicker.es.min.js"></script>
 
 
 
@@ -36,7 +44,7 @@ if (isset($_SESSION['data'])) {
 <body>
 	<div class="text-center">
 		<h2>Lista de Transacciones</h2>
-		<form action="" style="width:500px;margin:auto" class="form-inline">
+		<form action="" style="width:800px;margin:auto" class="form-inline">
 			<div class="form-group">
 				<label>Moneda</label>
 				<select name="moneda" class="form-control" id="moneda">
@@ -51,6 +59,14 @@ if (isset($_SESSION['data'])) {
 						<?php endif ?>
 					<?php endforeach ?>
 				</select>
+	            <div class="form-group">
+	                <div class='input-group date' id='datetimepicker1'>
+	                    <input type='text' name="created" class="form-control" value="<?php if(isset($_GET['created'])): echo $_GET['created']; endif; ?>" />
+	                    <span class="input-group-addon">
+	                        <span class="glyphicon glyphicon-calendar"></span>
+	                    </span>
+	                </div>
+	            </div>
 				<input type="submit" class="btn btn-default" name="buscar" value="Buscar">
 				<a href="index.php" class="btn btn-default">Agregar Transaccion</a>
 			</div>
@@ -59,11 +75,21 @@ if (isset($_SESSION['data'])) {
 	<div class="wrap container">
 		<div class="row">
 			<div class="col-md-6 col-sm-6">
-				<table class="table table-condensed table bordered">
+				<table class="table table-condensed table-bordered">
+					<?php if (isset($_GET['moneda']) and $_GET['moneda']): ?>
+						<?php $promedio = $db->get_promedio($_GET['moneda']) ?>
+						<?php $btc_suma = 0; ?>
+						<?php $monto_suma = 0; ?>
+						<?php foreach ($promedio as $key => $value): ?>
+								<?php $btc_suma = $btc_suma + str_replace(',', '.', $value->btc) ?>
+								<?php $monto_suma = $monto_suma + (float)str_replace(',','.',str_replace('.', '', $value->monto)) ?>
+							</tr>
+						<?php endforeach ?>
+					<?php endif; ?>
 					<tr>
-						<td id="display_btc_suma1" class="text-center"></td>
-						<td id="display_monto_suma1" class="text-center"></td>
-						<td id="display_division1" class="text-center"></td>
+						<td id="display_btc_suma1" class="text-center"><?php echo number_format($btc_suma,8,'.',',') ?></td>
+						<td id="display_monto_suma1" class="text-center"><?php echo number_format($monto_suma,2,'.',',') ?></td>
+						<td id="display_division1" class="text-center"><?php echo number_format((float)$monto_suma/$btc_suma,2,'.',',') ?></td>
 					</tr>
 					<tr>
 						<td></td>
@@ -74,7 +100,7 @@ if (isset($_SESSION['data'])) {
 				<div class="text-center">
 					<h3>Compra</h3>
 				</div>
-				<table class="table tabled-condensed table-bordered" id="compra">
+				<table class="table table-condensed table-bordered" id="compra">
 					<thead>
 						<th>#</th>
 						<th>Moneda</th>
@@ -97,10 +123,7 @@ if (isset($_SESSION['data'])) {
 								<td><?php echo $value->idoperacion ?></td>
 								<td><?php echo $value->moneda ?></td>
 								<td><?php echo str_replace(',', '.', $value->btc) ?></td>
-								<?php $btc_suma = $btc_suma + str_replace(',', '.', $value->btc) ?>
 								<td><?php echo number_format(str_replace(',','.',str_replace('.', '', $value->monto)),2,'.',',') ?></td>
-								<?php $monto_suma = $monto_suma + (float)str_replace(',','.',str_replace('.', '', $value->monto)) ?>
-
 								<td><?php echo $value->ref_pago ?></td>
 								<!--<td><?php echo $value->observacion ?></td>-->
 								<td>
@@ -117,11 +140,21 @@ if (isset($_SESSION['data'])) {
 				</table>
 			</div>
 			<div class="col-md-6 col-sm-6">
-				<table class="table table-condensed table bordered">
+				<table class="table table-condensed table-bordered">
+					<?php if (isset($_GET['moneda']) and $_GET['moneda']): ?>
+						<?php $promedio = $db->get_promedio($_GET['moneda'],'venta') ?>
+						<?php $btc_suma = 0; ?>
+						<?php $monto_suma = 0; ?>
+						<?php foreach ($promedio as $key => $value): ?>
+								<?php $btc_suma = $btc_suma + str_replace(',', '.', $value->btc) ?>
+								<?php $monto_suma = $monto_suma + (float)str_replace(',','.',str_replace('.', '', $value->monto)) ?>
+							</tr>
+						<?php endforeach ?>
+					<?php endif; ?>
 					<tr>
-						<td id="display_btc_suma2" class="text-center"></td>
-						<td id="display_monto_suma2" class="text-center"></td>
-						<td id="display_division2" class="text-center"></td>
+						<td id="display_btc_suma1" class="text-center"><?php echo number_format($btc_suma,8,'.',',') ?></td>
+						<td id="display_monto_suma1" class="text-center"><?php echo number_format($monto_suma,2,'.',',') ?></td>
+						<td id="display_division1" class="text-center"><?php echo number_format((float)$monto_suma/$btc_suma,2,'.',',') ?></td>
 					</tr>
 					<tr>
 						<td></td>
@@ -132,7 +165,7 @@ if (isset($_SESSION['data'])) {
 				<div class="text-center">
 					<h3>Venta</h3>
 				</div>
-				<table class="table tabled-condensed table-bordered" id="venta">
+				<table class="table table-condensed table-bordered" id="venta">
 					<thead>
 						<th>#</th>
 						<th>Moneda</th>
@@ -156,9 +189,7 @@ if (isset($_SESSION['data'])) {
 								<td><?php echo $value->idoperacion ?></td>
 								<td><?php echo $value->moneda ?></td>
 								<td><?php echo str_replace(',', '.', $value->btc) ?></td>
-								<?php $btc_suma2 = $btc_suma2 + str_replace(',', '.', $value->btc) ?>
 								<td><?php echo number_format(str_replace(',','.',str_replace('.', '', $value->monto)),2,'.',',') ?></td>
-								<?php $monto_suma2 = $monto_suma2 + (float)str_replace(',','.',str_replace('.', '', $value->monto)) ?>
 								<td><?php echo $value->ref_pago ?></td>
 								<!-- <td><?php echo $value->observacion ?></td> -->
 								<td>
@@ -175,53 +206,13 @@ if (isset($_SESSION['data'])) {
 				</table>
 			</div>
 		</div>
-		<input type="hidden" id="monto_suma" value="<?php echo number_format(isset($monto_suma) ? $monto_suma : 0,2,'.','') ?>">
-		<input type="hidden" id="btc_suma" value="<?php echo number_format(isset($btc_suma) ? $btc_suma : 0,8,'.','') ?>">
-		<?php if (isset($monto_suma)): ?>
-			
-		<input type="hidden" id="input_division1" value="<?php echo number_format(isset($btc_suma) ? $btc_suma : 0,8,'.','')/number_format(isset($monto_suma) ? $monto_suma : 0,2,'.','') ?>">
-		<?php endif ?>
-		<?php if (isset($monto_suma2)): ?>
-			
-		<input type="hidden" id="monto_suma2" value="<?php echo number_format(isset($monto_suma2) ? $monto_suma2 : 0,2,'.','') ?>">
-		<?php endif ?>
-		<input type="hidden" id="btc_suma2" value="<?php echo number_format(isset($btc_suma2) ? $btc_suma2 : 0,8,'.','') ?>">
-		<?php if (isset($monto_suma2)): ?>
-			
-		<input type="hidden" id="input_division2" value="<?php echo number_format(isset($btc_suma2) ? $btc_suma2 : 0,8,'.','')/number_format(isset($monto_suma2) ? $monto_suma2 : 0,2,'.','') ?>">
-		<?php endif ?>
-		<script type="text/javascript">
-		var formatNumber = {
-		 separador: ",", // separador para los miles
-		 sepDecimal: '.', // separador para los decimales
-		 formatear:function (num){
-		 num +='';
-		 var splitStr = num.split('.');
-		 var splitLeft = splitStr[0];
-		 var splitRight = splitStr.length > 1 ? this.sepDecimal + splitStr[1] : '';
-		 var regx = /(\d+)(\d{3})/;
-		 while (regx.test(splitLeft)) {
-		 splitLeft = splitLeft.replace(regx, '$1' + this.separador + '$2');
-		 }
-		 return this.simbol + splitLeft +splitRight;
-		 },
-		 new:function(num, simbol){
-		 this.simbol = simbol ||'';
-		 return this.formatear(num);
-		 }
-		}
-			$(document).ready(function(){
-				$("#display_btc_suma1").text(formatNumber.new($("#btc_suma").val()));
-				$("#display_monto_suma1").text(formatNumber.new($("#monto_suma").val()));
-				$("#display_division1").text(formatNumber.new(($("#monto_suma").val()/$("#btc_suma").val()).toFixed(2)));
-				$("#display_btc_suma2").text(formatNumber.new($("#btc_suma2").val()));
-				$("#display_monto_suma2").text(formatNumber.new($("#monto_suma2").val()));
-				$("#display_division2").text(formatNumber.new(($("#monto_suma2").val()/$("#btc_suma2").val()).toFixed(2)));
-
-			})
-		</script>
+		
+		
 		<script type="text/javascript">
 			$(document).ready(function() {
+				$('#datetimepicker1').datetimepicker({
+					format : 'YYYY-MM-DD HH:mm:ss'
+				});
 			    $('#compra,#venta').DataTable({
 			    	"aaSorting": [],
 			    	language:{

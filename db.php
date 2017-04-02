@@ -56,11 +56,24 @@ class Db extends PDO{
 		return $r;
 	}
 	public function get_transaction($tipo = 'compra'){
-		$query = "SELECT * FROM transaction where tipo = '".$tipo."' order by created asc";
+		if (isset($_GET['created']) and !empty($_GET['created'])) {
+			$query = "SELECT * FROM transaction where tipo = '".$tipo."' and created='".$_GET['created']."' order by created asc";
+		}else{
+			$query = "SELECT * FROM transaction where tipo = '".$tipo."' order by created asc";
+		}
 		return $this->get($query);
 	}
 	public function get_by_moneda($moneda,$tipo = "compra"){
-		$query = "SELECT * FROM transaction WHERE tipo = '".$tipo."' and moneda = '".$moneda."' order by created asc";
+		if (isset($_GET['created']) and !empty($_GET['created'])) {
+			$query = "SELECT * FROM transaction WHERE tipo = '".$tipo."' and moneda = '".$moneda."' and created='".$_GET['created']."' order by created asc";
+		}else{
+			$query = "SELECT * FROM transaction WHERE tipo = '".$tipo."' and moneda = '".$moneda."' order by created asc";
+		}
+		return $this->get($query);
+	}
+	public function get_promedio($moneda,$tipo = "compra"){
+		$query = "SELECT * from transaction WHERE	
+		created BETWEEN DATE_SUB(NOW(), INTERVAL 30 DAY) AND NOW() and tipo = '".$tipo."' and moneda = '".$moneda."' order by created asc";
 		return $this->get($query);
 	}
 }
